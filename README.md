@@ -4,7 +4,7 @@
 
 ---
 
-## 📦 Dependencies
+## Dependencies
 - `bash`
 - `powerprofilesctl` (from `power-profiles-daemon`)
 - `notify-send` (via `libnotify`)
@@ -78,9 +78,4 @@ systemctl --user enable --now power-gpuwatch.service
 ```bash
 journalctl --user -u power-gpuwatch.service -f
 ```
-
----
-
-## GitHub
-https://github.com/spslabo/power-gpuwatch
 
