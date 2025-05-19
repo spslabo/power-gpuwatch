@@ -117,11 +117,11 @@ while true; do
 
         powerprofilesctl set power-saver
         last_power_mode="power-saver"
-        notify "GPU session ended. Power-saver mode. Used ${kwh} kWh = \$${cost} CAD"
-        log "Session ended: ${kwh} kWh used, \$${cost} CAD."
+        notify "GPU session ended. Power-saver mode. Used ${kwh} kWh = \$${cost}"
+        log "Session ended: ${kwh} kWh used, \$${cost}."
 
         if [ ! -f "$CSV_LOG" ]; then
-            echo "Start Time,End Time,Duration (hrs),Avg Watts,kWh,CAD" > "$CSV_LOG"
+            echo "Start Time,End Time,Duration (hrs),Avg Watts,kWh,Cost" > "$CSV_LOG"
         fi
         echo "$session_start_stamp,$session_end_stamp,$duration,$avg_watts,$kwh,$cost" >> "$CSV_LOG"
     fi
