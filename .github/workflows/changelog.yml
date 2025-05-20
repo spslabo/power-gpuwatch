@@ -1,0 +1,45 @@
+name: Append to CHANGELOG on Push to Main
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2  # ensures the last 2 commits are available
+
+      - name: Generate changelog entry
+        run: |
+          COMMIT=$(git log -1 --pretty=format:"%H|%h|%s|%an")
+          IFS='|' read -r fullsha shortsha message author <<< "$COMMIT"
+
+          echo "## $(date +'%Y-%m-%d')" > NEW_CHANGELOG.md
+          echo "" >> NEW_CHANGELOG.md
+          echo "- ${message} ([\`${shortsha}\`](https://github.com/${{ github.repository }}/commit/${fullsha}) by ${author})" >> NEW_CHANGELOG.md
+          echo "" >> NEW_CHANGELOG.md
+
+          cat CHANGELOG.md >> NEW_CHANGELOG.md || true
+          mv NEW_CHANGELOG.md CHANGELOG.md
+
+      - name: Commit and push if changelog changed
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          if ! git diff --quiet; then
+            git add CHANGELOG.md
+            git commit -m "chore: update changelog on push to main"
+            git push origin HEAD:${{ github.event.repository.default_branch }}
+          else
+            echo "No changelog changes to commit."
+          fi
