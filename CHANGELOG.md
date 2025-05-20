@@ -1,3 +1,7 @@
+## 2025-05-20
+
+- chore: add auto-changelog workflow ([`17f9eaf`](https://github.com/spslabo/power-gpuwatch/commit/17f9eafc953ddcfe4e213cf4de1637f44e7fb59e) by spslabo)
+
 # Changelog
 
 ## [v1.0.1] - 2025-05-19
