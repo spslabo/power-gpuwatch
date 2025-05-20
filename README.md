@@ -79,3 +79,4 @@ systemctl --user enable --now power-gpuwatch.service
 journalctl --user -u power-gpuwatch.service -f
 ```
 
+
