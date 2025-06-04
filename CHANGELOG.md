@@ -1,3 +1,7 @@
+## 2025-06-04
+
+- Merge pull request #3 from spslabo/codex/update-script-to-reduce-logging-verbosity ([`52daa34`](https://github.com/spslabo/power-gpuwatch/commit/52daa34e9bf0016d1cb9011b1c026916bbbc444c) by spslabo)
+
 ## 2025-05-20
 
 - docs: trigger changelog workflow ([`4e17ee1`](https://github.com/spslabo/power-gpuwatch/commit/4e17ee1005045892dae83b441703d54720133bc4) by spslabo)
