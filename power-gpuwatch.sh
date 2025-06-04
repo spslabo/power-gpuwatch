@@ -29,9 +29,14 @@ now_unix() { date +%s; }
 get_gpu_busy() {
     value=$(cat "$GPU_BUSY_FILE" 2>/dev/null)
     if [[ ! "$value" =~ ^[0-9]+$ ]]; then
-        log "Warning: Invalid or missing GPU usage reading."
+        # Only warn once until a valid reading is seen again
+        if ! $invalid_gpu_warning_logged; then
+            log "Warning: Invalid or missing GPU usage reading."
+            invalid_gpu_warning_logged=true
+        fi
         echo 0
     else
+        invalid_gpu_warning_logged=false
         echo "$value"
     fi
 }
@@ -61,14 +66,12 @@ log "Started power-gpuwatch.sh with ${STARTUP_DELAY}s startup delay."
 sleep $STARTUP_DELAY
 session_active=false
 high_gpu_counter=0
-low_gpu_counter=0
 idle_gpu_counter=0
+invalid_gpu_warning_logged=false
 last_power_mode=""
 
 while true; do
     gpu_busy=$(get_gpu_busy)
-    log "GPU Busy: ${gpu_busy}%"
-
     # Check for performance trigger
     if ! $session_active && (( gpu_busy > GPU_USAGE_THRESHOLD )); then
         high_gpu_counter=$((high_gpu_counter + POLL_INTERVAL))
