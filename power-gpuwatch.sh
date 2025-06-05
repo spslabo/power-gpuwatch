@@ -95,8 +95,8 @@ check_dependencies_running() {
             exit 1
         fi
     done
-
-# Verify that required commands are functional
+}
+    # Verify that required commands are functional
 check_dependencies_running() {
     # Verify notify-send first so we can send alerts for other failures
 
