@@ -1,3 +1,15 @@
+## 2025-06-05
+
+- Merge pull request #5 from spslabo/3s6aqy-codex/find-and-fix-important-bug ([`2122899`](https://github.com/spslabo/power-gpuwatch/commit/212289965e92f37920510245e92a8802bfab745d) by spslabo)
+
+## 2025-06-05
+
+- Merge pull request #4 from spslabo/codex/find-and-fix-important-bug ([`45e0921`](https://github.com/spslabo/power-gpuwatch/commit/45e09216e6d6163f1f76f2df13b504e7fc5c5d65) by spslabo)
+
+## 2025-06-04
+
+- Merge pull request #3 from spslabo/codex/update-script-to-reduce-logging-verbosity ([`52daa34`](https://github.com/spslabo/power-gpuwatch/commit/52daa34e9bf0016d1cb9011b1c026916bbbc444c) by spslabo)
+
 ## 2025-05-20
 
 - docs: trigger changelog workflow ([`4e17ee1`](https://github.com/spslabo/power-gpuwatch/commit/4e17ee1005045892dae83b441703d54720133bc4) by spslabo)
