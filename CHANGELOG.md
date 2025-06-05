@@ -1,5 +1,9 @@
 ## 2025-06-05
 
+- Merge pull request #7 from spslabo/fix-codex-code ([`110e1fe`](https://github.com/spslabo/power-gpuwatch/commit/110e1fef54bf0e4deb316221fe14048c212529fe) by spslabo)
+
+## 2025-06-05
+
 - Fixed issue with missing bracket ([`07677a9`](https://github.com/spslabo/power-gpuwatch/commit/07677a976d35aef50f16b743d3bf4bffc6b91c2c) by spslabo)
 
 ## 2025-06-05
