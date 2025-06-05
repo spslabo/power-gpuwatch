@@ -37,17 +37,6 @@ if [ ! -f "$GPU_BUSY_FILE" ]; then
     fi
 fi
 
-# Verify required commands are available
-missing=false
-for cmd in bc upsc powerprofilesctl notify-send; do
-    if ! command -v "$cmd" >/dev/null 2>&1; then
-        echo "Error: required command '$cmd' not found." >&2
-        missing=true
-    fi
-done
-if $missing; then
-    exit 1
-fi
 
 # --- Utility Functions ---
 now() { date '+%Y-%m-%d %H:%M:%S'; }
@@ -86,9 +75,18 @@ notify() {
     notify-send "Power GPUWatch" "$1"
 }
 
-# Verify that required commands are functional
+# Verify that required commands are installed and operational
 check_dependencies_running() {
-    # Verify notify-send first so we can send alerts for other failures
+    required_cmds=(bc upsc powerprofilesctl notify-send)
+    for cmd in "${required_cmds[@]}"; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            log "Error: required command '$cmd' not found."
+            [ "$cmd" != "notify-send" ] && notify "power-gpuwatch: '$cmd' missing. Exiting."
+            exit 1
+        fi
+    done
+
+    # Verify notify-send first so we can alert for other failures
     if ! notify-send --version >/dev/null 2>&1; then
         log "Error: 'notify-send' command failed to run."
         logger -t power-gpuwatch "notify-send command not functional"
