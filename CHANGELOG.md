@@ -1,5 +1,9 @@
 ## 2025-06-05
 
+- Merge pull request #6 from spslabo/f7h3rc-codex/find-and-fix-important-bug ([`b9c53d0`](https://github.com/spslabo/power-gpuwatch/commit/b9c53d0f565821945d0b139b1948ddf86c8b3c3b) by spslabo)
+
+## 2025-06-05
+
 - Merge pull request #5 from spslabo/3s6aqy-codex/find-and-fix-important-bug ([`2122899`](https://github.com/spslabo/power-gpuwatch/commit/212289965e92f37920510245e92a8802bfab745d) by spslabo)
 
 ## 2025-06-05
