@@ -86,44 +86,9 @@ notify() {
 }
 
 # Verify that required commands are installed and operational
-check_dependencies_running() {
-    required_cmds=(bc upsc powerprofilesctl notify-send)
-    for cmd in "${required_cmds[@]}"; do
-        if ! command -v "$cmd" >/dev/null 2>&1; then
-            log "Error: required command '$cmd' not found."
-            [ "$cmd" != "notify-send" ] && notify "power-gpuwatch: '$cmd' missing. Exiting."
-            exit 1
-        fi
-    done
-}
+
     # Verify that required commands are functional
-check_dependencies_running() {
-    # Verify notify-send first so we can send alerts for other failures
 
-    if ! notify-send --version >/dev/null 2>&1; then
-        log "Error: 'notify-send' command failed to run."
-        logger -t power-gpuwatch "notify-send command not functional"
-        exit 1
-    fi
-
-    if ! echo 1 | bc >/dev/null 2>&1; then
-        log "Error: 'bc' command failed to execute."
-        notify "power-gpuwatch: 'bc' failed. Exiting."
-        exit 1
-    fi
-
-    if ! eval "$UPS_LOAD_CMD" >/dev/null 2>&1; then
-        log "Error: Unable to communicate with UPS using upsc."
-        notify "power-gpuwatch: UPS unreachable. Exiting."
-        exit 1
-    fi
-
-    if ! powerprofilesctl get >/dev/null 2>&1; then
-        log "Error: 'powerprofilesctl' command failed."
-        notify "power-gpuwatch: powerprofilesctl failure. Exiting."
-        exit 1
-    fi
-}
 
 # Locate the GPU usage file after verifying dependencies
 init_gpu_busy_file() {
@@ -139,6 +104,31 @@ init_gpu_busy_file() {
     if [ ! -f "$GPU_BUSY_FILE" ]; then
         log "Error: Unable to locate gpu_busy_percent file."
         notify "power-gpuwatch: GPU usage file not found. Exiting."
+        exit 1
+    fi
+}
+
+
+# --- Dependency Verification ---
+check_dependencies_running() {
+    if ! notify-send --version >/dev/null 2>&1; then
+        log "Error: 'notify-send' command failed to run."
+        logger -t power-gpuwatch "notify-send command not functional"
+        exit 1
+    fi
+    if ! echo 1 | bc >/dev/null 2>&1; then
+        log "Error: 'bc' command failed to execute."
+        notify "power-gpuwatch: 'bc' failed. Exiting."
+        exit 1
+    fi
+    if ! eval "$UPS_LOAD_CMD" >/dev/null 2>&1; then
+        log "Error: Unable to communicate with UPS using upsc."
+        notify "power-gpuwatch: UPS unreachable. Exiting."
+        exit 1
+    fi
+    if ! powerprofilesctl get >/dev/null 2>&1; then
+        log "Error: 'powerprofilesctl' command failed."
+        notify "power-gpuwatch: powerprofilesctl failure. Exiting."
         exit 1
     fi
 }
