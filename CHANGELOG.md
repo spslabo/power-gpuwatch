@@ -1,5 +1,9 @@
 ## 2025-06-05
 
+- Fixed issue with missing bracket ([`07677a9`](https://github.com/spslabo/power-gpuwatch/commit/07677a976d35aef50f16b743d3bf4bffc6b91c2c) by spslabo)
+
+## 2025-06-05
+
 - Merge pull request #6 from spslabo/f7h3rc-codex/find-and-fix-important-bug ([`b9c53d0`](https://github.com/spslabo/power-gpuwatch/commit/b9c53d0f565821945d0b139b1948ddf86c8b3c3b) by spslabo)
 
 ## 2025-06-05
