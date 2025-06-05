@@ -22,16 +22,20 @@ STARTUP_DELAY=15            # seconds before first check
 
 # --- Setup ---
 mkdir -p "$LOG_DIR"
-
 # --- Utility Functions ---
 now() { date '+%Y-%m-%d %H:%M:%S'; }
 now_unix() { date +%s; }
 get_gpu_busy() {
     value=$(cat "$GPU_BUSY_FILE" 2>/dev/null)
     if [[ ! "$value" =~ ^[0-9]+$ ]]; then
-        log "Warning: Invalid or missing GPU usage reading."
+        # Only warn once until a valid reading is seen again
+        if ! $invalid_gpu_warning_logged; then
+            log "Warning: Invalid or missing GPU usage reading."
+            invalid_gpu_warning_logged=true
+        fi
         echo 0
     else
+        invalid_gpu_warning_logged=false
         echo "$value"
     fi
 }
@@ -55,20 +59,75 @@ notify() {
     notify-send "Power GPUWatch" "$1"
 }
 
+# Verify that required commands are installed and operational
+check_dependencies_running() {
+    required_cmds=(bc upsc powerprofilesctl notify-send)
+    for cmd in "${required_cmds[@]}"; do
+        if ! command -v "$cmd" >/dev/null 2>&1; then
+            log "Error: required command '$cmd' not found."
+            [ "$cmd" != "notify-send" ] && notify "power-gpuwatch: '$cmd' missing. Exiting."
+            exit 1
+        fi
+    done
+
+    # Verify notify-send first so we can alert for other failures
+    if ! notify-send --version >/dev/null 2>&1; then
+        log "Error: 'notify-send' command failed to run."
+        logger -t power-gpuwatch "notify-send command not functional"
+        exit 1
+    fi
+
+    if ! echo 1 | bc >/dev/null 2>&1; then
+        log "Error: 'bc' command failed to execute."
+        notify "power-gpuwatch: 'bc' failed. Exiting."
+        exit 1
+    fi
+
+    if ! eval "$UPS_LOAD_CMD" >/dev/null 2>&1; then
+        log "Error: Unable to communicate with UPS using upsc."
+        notify "power-gpuwatch: UPS unreachable. Exiting."
+        exit 1
+    fi
+
+    if ! powerprofilesctl get >/dev/null 2>&1; then
+        log "Error: 'powerprofilesctl' command failed."
+        notify "power-gpuwatch: powerprofilesctl failure. Exiting."
+        exit 1
+    fi
+}
+
+# Locate the GPU usage file after verifying dependencies
+init_gpu_busy_file() {
+    if [ -f "$GPU_BUSY_FILE" ]; then
+        return
+    fi
+    for candidate in /sys/class/drm/card*/device/gpu_busy_percent; do
+        if [ -f "$candidate" ]; then
+            GPU_BUSY_FILE="$candidate"
+            break
+        fi
+    done
+    if [ ! -f "$GPU_BUSY_FILE" ]; then
+        log "Error: Unable to locate gpu_busy_percent file."
+        notify "power-gpuwatch: GPU usage file not found. Exiting."
+        exit 1
+    fi
+}
+
 # --- Initialize ---
+check_dependencies_running
+init_gpu_busy_file
 logger -t power-gpuwatch "Started power-gpuwatch.sh with ${STARTUP_DELAY}s startup delay."
 log "Started power-gpuwatch.sh with ${STARTUP_DELAY}s startup delay."
 sleep $STARTUP_DELAY
 session_active=false
 high_gpu_counter=0
-low_gpu_counter=0
 idle_gpu_counter=0
+invalid_gpu_warning_logged=false
 last_power_mode=""
 
 while true; do
     gpu_busy=$(get_gpu_busy)
-    log "GPU Busy: ${gpu_busy}%"
-
     # Check for performance trigger
     if ! $session_active && (( gpu_busy > GPU_USAGE_THRESHOLD )); then
         high_gpu_counter=$((high_gpu_counter + POLL_INTERVAL))
