@@ -22,8 +22,6 @@ STARTUP_DELAY=15            # seconds before first check
 
 # --- Setup ---
 mkdir -p "$LOG_DIR"
-
-
 # Determine GPU usage file dynamically (card index may change)
 if [ ! -f "$GPU_BUSY_FILE" ]; then
     for candidate in /sys/class/drm/card*/device/gpu_busy_percent; do
@@ -87,7 +85,6 @@ notify() {
     notify-send "Power GPUWatch" "$1"
 }
 
-
 # Verify that required commands are installed and operational
 check_dependencies_running() {
     required_cmds=(bc upsc powerprofilesctl notify-send)
@@ -99,7 +96,6 @@ check_dependencies_running() {
         fi
     done
 
-    # Verify notify-send first so we can alert for other failures
 # Verify that required commands are functional
 check_dependencies_running() {
     # Verify notify-send first so we can send alerts for other failures
@@ -129,6 +125,27 @@ check_dependencies_running() {
     fi
 }
 
+# Locate the GPU usage file after verifying dependencies
+init_gpu_busy_file() {
+    if [ -f "$GPU_BUSY_FILE" ]; then
+        return
+    fi
+    for candidate in /sys/class/drm/card*/device/gpu_busy_percent; do
+        if [ -f "$candidate" ]; then
+            GPU_BUSY_FILE="$candidate"
+            break
+        fi
+    done
+    if [ ! -f "$GPU_BUSY_FILE" ]; then
+        log "Error: Unable to locate gpu_busy_percent file."
+        notify "power-gpuwatch: GPU usage file not found. Exiting."
+        exit 1
+    fi
+}
+
+# --- Initialize ---
+check_dependencies_running
+init_gpu_busy_file
 # --- Initialize ---
 check_dependencies_running
 logger -t power-gpuwatch "Started power-gpuwatch.sh with ${STARTUP_DELAY}s startup delay."
